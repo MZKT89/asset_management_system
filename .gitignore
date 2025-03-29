@@ -1,0 +1,14 @@
+# 常见的忽略文件
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+node_modules/
+venv/
+.env
+
+
+pages/__pycache__/
+utils/__pycache__/
