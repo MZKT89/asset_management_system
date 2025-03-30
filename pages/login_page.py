@@ -10,6 +10,7 @@ def show():
     if st.button("登录"):
         # auth.py - login 函数进行登录验证
         user = login(username, password)
+        print(user)
         if user:
             # 登录成功，将用户信息存入会话状态
             st.session_state.user = user
@@ -18,7 +19,6 @@ def show():
         else:
             # 登录失败，显示错误信息
             st.error("账号或密码错误。")
-        print("登录成功")
         
 
     # 以访客身份登录按钮

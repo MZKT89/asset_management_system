@@ -1,36 +1,33 @@
-# 模拟用户数据库，实际应用中可替换为从数据库中读取
-users = {
-    "admin": {
-        "password": "admin123",
-        "role": "admin",
-        "d_id": 1
-    },
-    "employee": {
-        "password": "employee123",
-        "role": "employee",
-        "d_id": 1
-    },
-    "guest": {
-        "password": "guest123",
-        "role": "guest",
-        "d_id": None
-    }
-}
+from utils.data_utils import *
+import bcrypt
 
-def login(username, password):
+def hash_password(password):
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed
+
+def verify_password(input_password, hashed_password):
+    return bcrypt.checkpw(input_password.encode('utf-8'), hashed_password)
+
+
+def login(e_id, password):
     """
     用户登录验证函数
-    :param username: 输入的用户名
+    :param e_id: 输入的员工 ID（作为用户名）
     :param password: 输入的密码
     :return: 如果验证通过，返回用户信息字典；否则返回 None
     """
-    if username in users and users[username]["password"] == password:
-        return {
-            "username": username,
-            "role": users[username]["role"],
-            "d_id": users[username]["d_id"]
+    result = query_user_by_credentials(e_id, password)
+
+    if result:
+        user_info = {
+            "e_id": result[0],
+            "role": "super-admin" if result[1] == 2 else ("dep-admin" if result[1] == 1 else "non-admin"),
+            "d_id": result[2]
         }
-    return None
+        return user_info    
+    else:
+        return None
 
 
 def login_as_guest():
@@ -39,35 +36,7 @@ def login_as_guest():
     :return: 访客用户信息字典
     """
     return {
-        "username": "guest",
+        "e_id": None,
         "role": "guest",
         "d_id": None
     }
-
-
-def is_super_admin(user):
-    """
-    判断用户是否为超级管理员
-    :param user: 用户信息字典
-    :return: 如果是超级管理员返回 True，否则返回 False
-    """
-    return user["role"] == "admin"
-
-
-def is_department_admin(user):
-    """
-    判断用户是否为部门管理员
-    :param user: 用户信息字典
-    :return: 如果是部门管理员返回 True，否则返回 False
-    """
-    return user["role"] == "admin"
-
-
-def has_permission(user, required_role):
-    """
-    检查用户是否具有指定角色的权限
-    :param user: 用户信息字典
-    :param required_role: 所需角色
-    :return: 如果用户具有该角色权限返回 True，否则返回 False
-    """
-    return user["role"] == required_role
