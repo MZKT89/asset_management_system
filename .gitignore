@@ -12,3 +12,5 @@ venv/
 
 pages/__pycache__/
 utils/__pycache__/
+local_test/
+test_assetdb.db

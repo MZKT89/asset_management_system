@@ -24,7 +24,7 @@ def create_tables():
         # 创建 DEPARTMENT 表
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS DEPARTMENT (
-                d_ID VARCHAR(50) PRIMARY KEY,
+                d_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 Department_Name VARCHAR(100) NOT NULL,
                 a_ID VARCHAR(50) UNIQUE,
                 FOREIGN KEY (a_ID) REFERENCES ADMINISTRATOR(a_ID)
@@ -33,7 +33,7 @@ def create_tables():
         # 创建 ITEM 表
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS ITEM (
-                ID VARCHAR(50) PRIMARY KEY,
+                ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 Item_Name VARCHAR(100) NOT NULL,
                 d_ID VARCHAR(50) NOT NULL,
                 Placement_Location VARCHAR(100),
@@ -45,7 +45,7 @@ def create_tables():
         # 创建 EMPLOYEE 表
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS EMPLOYEE (
-                e_ID VARCHAR(50) PRIMARY KEY,
+                e_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 Name VARCHAR(100) NOT NULL,
                 d_ID VARCHAR(50) NOT NULL,
                 Position INT CHECK (Position IN (0, 1)),
@@ -55,7 +55,7 @@ def create_tables():
         # 创建 PURCHASE_INFO 表
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS PURCHASE_INFO (
-                ID VARCHAR(50) PRIMARY KEY,
+                ID INTEGER,
                 Asset_Cost DECIMAL(10,2) NOT NULL,
                 Purchase_Year INT,
                 d_ID VARCHAR(50) NOT NULL,
@@ -67,7 +67,7 @@ def create_tables():
         # 创建 ADMINISTRATOR 表
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS ADMINISTRATOR (
-                a_ID VARCHAR(50) PRIMARY KEY,
+                a_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 Name VARCHAR(100) NOT NULL,
                 e_ID VARCHAR(50) UNIQUE NOT NULL,
                 Contact_Info VARCHAR(255),
@@ -76,13 +76,11 @@ def create_tables():
         ''')
         conn.commit()
         conn.close()
-
-
+        
 # 插入数据函数示例
-def insert_department(d_id, department_name, a_id):
+def insert_department(department_name, a_id):
     """
     向 DEPARTMENT 表插入数据
-    :param d_id: 部门 ID
     :param department_name: 部门名称
     :param a_id: 管理员 ID
     :return: 插入结果
@@ -92,9 +90,9 @@ def insert_department(d_id, department_name, a_id):
         cursor = conn.cursor()
         try:
             cursor.execute('''
-                INSERT INTO DEPARTMENT (d_ID, Department_Name, a_ID)
-                VALUES (?,?,?)
-            ''', (d_id, department_name, a_id))
+                INSERT INTO DEPARTMENT (Department_Name, a_ID)
+                VALUES (?,?)
+            ''', (department_name, a_id))
             conn.commit()
             return True
         except sqlite3.Error as e:
@@ -173,4 +171,4 @@ def delete_department(d_id):
     return False
 
 
-# 你可以按照上述示例为其他表添加插入、查询、更新和删除函数
+# 你可以按照上述示例为其他表添加插入、查询、更新和删除函数    

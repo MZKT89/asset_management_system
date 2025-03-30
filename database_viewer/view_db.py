@@ -30,7 +30,8 @@ def view_table_data(conn, table_name):
 
 def main():
     # 连接到 SQLite 数据库文件
-    db_file = '../asset_management.db'
+    # db_file = '../asset_management.db'
+    db_file = '../local_test/assetdb.db'
     try:
         conn = sqlite3.connect(db_file)
         # 列出所有表名
