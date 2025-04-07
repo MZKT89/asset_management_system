@@ -24,8 +24,8 @@ if 'user' not in st.session_state:
 # 检查数据库是否已经初始化
 if 'database_initialized' not in st.session_state:
     # 数据库未初始化，调用 create_database 函数
-    # create_tables()
-    # test_login_add_data()
+    create_tables()
+    test_login_add_data()
     # 标记数据库已初始化
     st.session_state.database_initialized = True
 
@@ -63,9 +63,9 @@ else:
         expenditure_page.show()
     elif page == "资产详情":
         asset_detail_page.show()
-    elif page == "新增资产":
+    elif page == "新增物品录入信息":
         add_asset_page.show()
-    elif page == "编辑资产状态":
+    elif page == "编辑物品状态":
         edit_status_page.show()
     elif page == "账号权限设置":
         account_permission_page.show()
