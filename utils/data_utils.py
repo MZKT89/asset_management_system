@@ -827,3 +827,84 @@ def get_department_items(department_id):
             conn.close()
     return []
 
+def get_department_expenditure(department_id, year):
+    conn = create_connection()
+    if conn:
+        cursor = conn.cursor()
+        try:
+            # 查询当前年的总采购成本
+            cursor.execute("""
+                SELECT SUM(Asset_Cost)
+                FROM PURCHASE_INFO
+                WHERE d_ID = ? AND Purchase_Year = ?
+            """, (department_id, year))
+            result = cursor.fetchone()
+            total_cost = result[0] if result[0] is not None else 0
+
+            # 查询上一年的采购成本（用于比较）
+            cursor.execute("""
+                SELECT SUM(Asset_Cost)
+                FROM PURCHASE_INFO
+                WHERE d_ID = ? AND Purchase_Year = ?
+            """, (department_id, year - 1))
+            result_prev = cursor.fetchone()
+            previous_cost = result_prev[0] if result_prev[0] is not None else 0
+
+            # 计算同比增减比例
+            if previous_cost > 0:
+                change_percentage = ((total_cost - previous_cost) / previous_cost) * 100
+                comparison = f"{'+' if change_percentage >= 0 else ''}{round(change_percentage)}%"
+            else:
+                comparison = "N/A"
+
+            return {"total_cost": total_cost, "comparison": comparison}
+        except sqlite3.Error as e:
+            print(f"计算部门采购总支出出错: {e}")
+            return {"total_cost": 0, "comparison": "Error"}
+        finally:
+            conn.close()
+    return {"total_cost": 0, "comparison": "No Connection"}
+def get_expenditure_trend(department_id, current_year):
+    """
+    获取指定部门近 5 年（包括当前年）的采购趋势数据
+    :param department_id: 部门ID
+    :param current_year: 当前年份（例如 2023）
+    :return: 返回一个列表，每项为字典，包含年份和对应的采购总支出，例如：
+             [
+                {"year": 2019, "total_cost": 45000},
+                {"year": 2020, "total_cost": 48000},
+                {"year": 2021, "total_cost": 50000},
+                {"year": 2022, "total_cost": 52000},
+                {"year": 2023, "total_cost": 50000}
+             ]
+    """
+    conn = create_connection()
+    if conn:
+        cursor = conn.cursor()
+        try:
+            start_year = current_year - 4
+            # 查询从 start_year 到 current_year 之间各年的采购总成本数据
+            cursor.execute("""
+                SELECT Purchase_Year, SUM(Asset_Cost) as total_cost
+                FROM PURCHASE_INFO
+                WHERE d_ID = ? AND Purchase_Year BETWEEN ? AND ?
+                GROUP BY Purchase_Year
+                ORDER BY Purchase_Year ASC
+            """, (department_id, start_year, current_year))
+            results = cursor.fetchall()
+            # 将查询结果转换为字典形式，便于后续补全数据
+            trend_dict = {year: total_cost if total_cost is not None else 0 for (year, total_cost) in results}
+            
+            # 构造完整的 5 年数据，如果某年无数据，则 total_cost 为 0
+            trend_data = []
+            for year in range(start_year, current_year + 1):
+                trend_data.append({
+                    "year": year,
+                    "total_cost": trend_dict.get(year, 0)
+                })
+            return trend_data
+        except sqlite3.Error as e:
+            print(f"获取采购趋势数据出错: {e}")
+        finally:
+            conn.close()
+    return []
