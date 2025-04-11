@@ -7,21 +7,20 @@ from utils.data_utils import (
 )
 
 def add_asset_page():
-    st.title("新增资产")
+    st.title("Add New Asset")
 
-    # 显示资产是否添加成功的消息
+    # Display a message indicating whether the asset was added successfully
     if "asset_add_success" in st.session_state:
         st.success(st.session_state["asset_add_success"])
         del st.session_state["asset_add_success"]
 
-
-    # 获取部门列表
+    # Get the department list
     departments = get_department_list()
     if not departments:
-        st.error("无法获取部门列表")
+        st.error("Unable to get the department list")
         return
-    
-    # 初始化表单字段默认值（首次访问&提交后除“部门”选项外其他全部自动初始化）
+
+    # Initialize default values for form fields (automatically initialize all except the 'Department' option on first visit and after submission)
     if "item_name" not in st.session_state:
         st.session_state["item_name"] = ""
     if "placement_location" not in st.session_state:
@@ -33,70 +32,67 @@ def add_asset_page():
     if "usable_life" not in st.session_state:
         st.session_state["usable_life"] = 5
 
-    # 表单
+    # Form
     with st.form("add_asset_form"):
-        # 资产ID（自动生成）
-        item_id = st.text_input("资产ID", value="自动生成", disabled=True)
-        
-        # 资产名称
-        item_name = st.text_input("资产名称*", key="item_name")
-        
-        # 所属部门
+        # Asset ID (automatically generated)
+        item_id = st.text_input("Asset ID", value="Automatically generated", disabled=True)
+
+        # Asset name
+        item_name = st.text_input("Asset Name*", key="item_name")
+
+        # Affiliated department
         department = st.selectbox(
-            "所属部门*",
-            options=list(dict.fromkeys(departments)),  # 去重
+            "Affiliated Department*",
+            options=list(dict.fromkeys(departments)),  # Remove duplicates
             format_func=lambda x: x[1]
         )
-        
+
         col1, col2 = st.columns(2)
         with col1:
-            # 采购金额
+            # Purchase amount
             asset_cost = st.number_input(
-                "采购金额*", 
-                min_value=0.01, 
+                "Purchase Amount*",
+                min_value=0.01,
                 format="%.2f",
-                # value=0.01,
                 key="asset_cost"
             )
-        
+
         with col2:
-            # 采购年份
+            # Purchase year
             current_year = datetime.now().year
             purchase_year = st.number_input(
-                "采购年份*", 
-                min_value=2005, 
-                max_value=2025, 
-                # value=current_year,
+                "Purchase Year*",
+                min_value=2005,
+                max_value=2025,
                 key="purchase_year"
             )
-        
-        # 存放位置
-        placement_location = st.text_input("存放位置*", key="placement_location")
-        
+
+        # Storage location
+        placement_location = st.text_input("Storage Location*", key="placement_location")
+
         col3, col4 = st.columns(2)
         with col3:
-            # 使用年限
+            # Service life
             usable_life = st.number_input(
-                "使用年限（年）", 
+                "Service Life (Years)",
                 min_value=1,
-                # value=5,
                 key="usable_life"
             )
-        
-        # 提交按钮
-        submitted = st.form_submit_button("提交")
-        
+
+        # Submit button
+        submitted = st.form_submit_button("Submit")
+
         if submitted:
-            # 验证必填字段
+            # Validate required fields
             if not item_name:
-                st.error("请输入资产名称")
+                st.error("Please enter the asset name")
                 return
-            
+
             if not placement_location:
-                st.error("请输入存放位置")
+                st.error("Please enter the storage location")
                 return
-            
-            # 准备提交数据
+
+            # Prepare data for submission
             asset_data = {
                 "Item_Name": item_name,
                 "d_ID": department[0],
@@ -107,28 +103,29 @@ def add_asset_page():
                 "Purchase_Year": int(purchase_year),
                 "Usable_Life": usable_life
             }
-            
-            # 使用验证函数验证数据
+
+            # Use the validation function to validate the data
             is_valid, error_msg = validate_item_data(asset_data)
-            
+
             if not is_valid:
-                st.error(f"数据验证失败：{error_msg}")
+                st.error(f"Data validation failed: {error_msg}")
                 return
-            
-            # 添加资产
+
+            # Add the asset
             new_item_id = add_new_item(asset_data)
-            
+
             if new_item_id:
-                st.session_state["asset_add_success"] = f"资产添加成功！资产ID：{new_item_id}"
-                # 提交成功后清空表单字段
+                st.session_state["asset_add_success"] = f"Asset added successfully! Asset ID: {new_item_id}"
+                # Clear form fields after successful submission
                 for key in ["item_name", "placement_location", "asset_cost", "purchase_year", "usable_life"]:
                     st.session_state.pop(key, None)
                 st.rerun()
             else:
-                st.error("添加失败，请稍后重试")
-    # 返回按钮        
-    if st.button("返回查询页面"):
-        st.session_state["selected_page"] = "资产查询"
+                st.error("Failed to add. Please try again later")
+
+    # Back button
+    if st.button("Back to Query Page"):
+        st.session_state["selected_page"] = "Asset Query"
         st.rerun()
 
 def show():
@@ -136,3 +133,4 @@ def show():
 
 if __name__ == "__main__":
     show()
+    

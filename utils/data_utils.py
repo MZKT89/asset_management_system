@@ -123,22 +123,39 @@ def query_user_by_credentials(username, password):
         cursor = conn.cursor()
         try:
             cursor.execute('''
-                SELECT e_ID, Position, d_ID, password
+                SELECT e_ID, Position, d_ID, Name, password
                 FROM EMPLOYEE
                 WHERE e_ID =?
             ''', (username,))
             result = cursor.fetchone()
             if result:
-                stored_password = result[3]
+                stored_password = result[4]
                 if verify_password(password, stored_password):
-                    return result[:3]  # 返回除密码外的用户信息
+                    return result[:4]  # 返回除密码外的用户信息
             return None
         except sqlite3.Error as e:
             print(f"数据库查询错误: {e}")
         finally:
             conn.close()
     return None
-
+def query_department_Name(d_id):
+    """
+    根据部门ID查询部门名称
+    :param d_id: 部门ID
+    :return: 部门名称
+    """
+    conn = create_connection()
+    if conn:
+        cursor = conn.cursor()
+        try:
+            cursor.execute('SELECT Department_Name FROM DEPARTMENT WHERE d_ID = ?', (d_id,))
+            result = cursor.fetchone()
+            return result[0] if result else None
+        except sqlite3.Error as e:
+            print(f"查询部门名称出错: {e}")
+        finally:
+            conn.close()
+    return None
 
 def get_all_users():
     conn = create_connection()

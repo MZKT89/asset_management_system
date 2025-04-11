@@ -16,13 +16,13 @@ def get_purchase_records(item_id):
             ''', (item_id,))
             return cursor.fetchall()
         except sqlite3.Error as e:
-            print(f"查询采购记录失败: {e}")
+            print(f"Failed to query purchase records: {e}")
         finally:
             conn.close()
     return []
 
 def show():
-    st.title("资产详情页")
+    st.title("Asset Details Page")
 
     user = st.session_state.get("user", {})
     role = user.get("role", "guest")
@@ -30,30 +30,30 @@ def show():
     d_id = user.get("d_id", None)
     passed_id = st.session_state.get("selected_asset_id", None)
 
-    # 如果是 guest，只使用传入的 asset_id
+    # If it's a guest, only use the passed asset_id
     if role == "guest":
         if not passed_id:
-            st.warning("访客请先从查询页面选择要查看的资产。")
+            st.warning("Guests please select an asset to view from the query page first.")
             return
         asset = get_item_details(passed_id)
         if not asset:
-            st.error("未找到该资产信息")
+            st.error("Asset information not found.")
             return
     else:
         all_items = get_department_items(d_id)
         if not all_items:
-            st.warning("没有可查看的资产")
+            st.warning("There are no assets to view.")
             return
 
-    # 构建访客的资产详情列表
+    # Build the asset details list for guests
     if role == "guest":
         item_options = {f"{asset['ID']} - {asset['Item_Name']}": asset['ID']}
     else:
-        # 非访客
+        # Non - guests
         item_options = {f"{item['ID']} - {item['Item_Name']}": item['ID'] for item in all_items}
     option_keys = list(item_options.keys())
 
-    # 计算默认选项 key
+    # Calculate the default option key
     default_key = None
     if passed_id:
         for label, val in item_options.items():
@@ -62,7 +62,7 @@ def show():
                 break
 
     selected_item_key = st.selectbox(
-        "选择资产",
+        "Select an asset",
         options=option_keys,
         index=option_keys.index(default_key) if default_key else 0,
         format_func=lambda x: x
@@ -70,26 +70,26 @@ def show():
 
     selected_item_id = item_options[selected_item_key]
     asset = get_item_details(selected_item_id)
-    st.session_state["selected_asset_id"] = selected_item_id  # 保持一致
+    st.session_state["selected_asset_id"] = selected_item_id  # Keep it consistent
 
     if not asset:
-        st.error("未找到该资产信息")
+        st.error("Asset information not found.")
         return
 
     purchase_records = get_purchase_records(asset["ID"])
 
-    # ---------------------- 基本信息卡片 ----------------------
-    st.subheader("基本信息")
+    # ---------------------- Basic Information Card ----------------------
+    st.subheader("Basic Information")
     cols = st.columns(2)
     with cols[0]:
-        st.markdown(f"**资产 ID**: {asset['ID']}")
-        st.markdown(f"**资产名称**: {asset['Item_Name']}")
-        st.markdown(f"**管理部门**: {asset['Department_Name']}")
-        st.markdown(f"**存放位置**: {asset['Placement_Location']}")
-        st.markdown(f"**状态**: {'🟢 使用中' if asset['Status'] == 1 else '🔴 报废'}")
+        st.markdown(f"**Asset ID**: {asset['ID']}")
+        st.markdown(f"**Asset Name**: {asset['Item_Name']}")
+        st.markdown(f"**Managing Department**: {asset['Department_Name']}")
+        st.markdown(f"**Storage Location**: {asset['Placement_Location']}")
+        st.markdown(f"**Status**: {'🟢 In use' if asset['Status'] == 1 else '🔴 Scrapped'}")
 
     with cols[1]:
-        # 获取采购信息（可能无记录）
+        # Get purchase information (there may be no records)
         year = "-"
         life = "-"
         contact = "-"
@@ -103,13 +103,13 @@ def show():
                 year = purchase[0]
                 life = purchase[1]
             conn.close()
-        st.markdown(f"**采购年份**: {year}")
-        st.markdown(f"**使用寿命**: {life} 年")
+        st.markdown(f"**Purchase Year**: {year}")
+        st.markdown(f"**Service Life**: {life} years")
 
         if role != "guest":
-            st.markdown(f"**当前价值**: ￥{asset['Current_Value']:.2f}")
+            st.markdown(f"**Current Value**: ￥{asset['Current_Value']:.2f}")
 
-        # 获取管理员信息
+        # Get administrator information
         conn = create_connection()
         cursor = conn.cursor()
         cursor.execute('''
@@ -119,29 +119,30 @@ def show():
         admin_info = cursor.fetchone()
         if admin_info:
             admin, contact = admin_info
-        st.markdown(f"**部门管理员**: {admin}")
-        st.markdown(f"**联系方式**: {contact}")
+        st.markdown(f"**Department Administrator**: {admin}")
+        st.markdown(f"**Contact Information**: {contact}")
 
-    # ---------------------- 采购记录（访客隐藏） ----------------------
+    # ---------------------- Purchase Records (Hidden for Guests) ----------------------
     if role != "guest":
-        st.subheader("采购记录")
+        st.subheader("Purchase Records")
         if purchase_records:
             st.table([
-                {"采购单号": r[0], "采购金额": f"￥{r[1]:.2f}", "采购部门": r[2]}
+                {"Purchase Order Number": r[0], "Purchase Amount": f"￥{r[1]:.2f}", "Purchasing Department": r[2]}
                 for r in purchase_records
             ])
         else:
-            st.info("暂无采购记录")
+            st.info("No purchase records available.")
 
-    # ---------------------- 操作按钮（仅部门管理员） ----------------------
+    # ---------------------- Operation Buttons (Only for Department Administrators) ----------------------
     if role == "dep-admin" and check_department_admin(e_id, asset["d_ID"]):
-        if st.button("编辑物品状态", key="edit_status_from_detail"):
+        if st.button("Edit Item Status", key="edit_status_from_detail"):
             st.session_state["edit_target_id"] = asset["ID"]
-            st.session_state["selected_page"] = "编辑物品状态"
+            st.session_state["selected_page"] = "Edit Item Status"
             st.rerun()
 
-    # ---------------------- 返回按钮 ----------------------
-    if st.button("返回查询页面"):
-        st.session_state["selected_page"] = "资产查询"
+    # ---------------------- Back Button ----------------------
+    if st.button("Back to Query Page"):
+        st.session_state["selected_page"] = "Asset Query"
         st.session_state.pop("selected_asset_id", None)
         st.rerun()
+    

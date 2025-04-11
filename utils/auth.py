@@ -18,12 +18,16 @@ def login(e_id, password):
     :return: 如果验证通过，返回用户信息字典；否则返回 None
     """
     result = query_user_by_credentials(e_id, password)
-
+    if result is None:
+        return None  # 如果 result 为 None，直接返回 None
+    departmentResult = query_department_Name(result[2])
     if result:
         user_info = {
             "e_id": result[0],
             "role": "super-admin" if result[1] == 2 else ("dep-admin" if result[1] == 1 else "non-admin"),
-            "d_id": result[2]
+            "d_id": result[2],
+            "Name": result[3],
+            "DepartmentName": departmentResult 
         }
         return user_info    
     else:
