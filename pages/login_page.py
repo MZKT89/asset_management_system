@@ -14,6 +14,11 @@ def show():
         if user:
             # 登录成功，将用户信息存入会话状态
             st.session_state.user = user
+            st.session_state["selected_page"] = "资产查询"  # 登录成功后默认跳转到查询页面
+            print('Login through USER! Change default page to asset query!')
+            # 清除之前遗留的资产ID等状态
+            st.session_state.pop("selected_asset_id", None)
+            st.session_state.pop("edit_target_id", None)            
             # 重新运行应用，跳转到主页面
             st.rerun()
         else:
@@ -25,6 +30,11 @@ def show():
     if st.button("以访客身份登录"):
         # 调用 auth.py - login_as_guest 函数以访客身份登录
         st.session_state.user = login_as_guest()
+        st.session_state["selected_page"] = "资产查询"  # 登录成功后默认跳转到查询页面
+        print('Login through GUEST! Change default page to asset query!')
+        # 清除之前遗留的资产ID等状态
+        st.session_state.pop("selected_asset_id", None)
+        st.session_state.pop("edit_target_id", None)            
         # 重新运行应用，跳转到主页面
         st.rerun()
         print("以访客身份登录成功")
