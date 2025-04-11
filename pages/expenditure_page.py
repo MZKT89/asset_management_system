@@ -69,3 +69,8 @@ def show():
         st.line_chart(df_trend["total_cost"])
     else:
         st.write("暂无数据")
+
+    if st.button("返回查询页面"):
+        st.session_state["selected_page"] = "资产查询"
+        st.session_state.pop("edit_target_id", None)
+        st.rerun()
