@@ -45,17 +45,34 @@ else:
         st.rerun()
 
     # 根据用户角色显示不同的页面选项
-    # 根据用户角色显示不同的页面选项
     if st.session_state.user["role"] == "super-admin":
-        pages = ["资产查询", "部门采购总支出", "新增物品录入信息", "编辑物品状态", "账号权限设置"]
+        pages = ["资产查询", "资产详情", "部门采购总支出", "新增物品录入信息", "编辑物品状态", "账号权限设置"]
     elif st.session_state.user["role"] == "dep-admin":
-        pages = ["资产查询", "部门采购总支出", "新增物品录入信息", "编辑物品状态"]
+        pages = ["资产查询", "资产详情", "部门采购总支出", "新增物品录入信息", "编辑物品状态"]
     elif st.session_state.user["role"] == "non-admin":
-        pages = ["资产查询", "部门采购总支出"]
+        pages = ["资产查询", "资产详情", "部门采购总支出"]
     else:  # 访客
-        pages = ["资产查询"]
+        pages = ["资产查询", "资产详情"]
 
-    page = st.sidebar.selectbox("选择页面", pages)
+    # page = st.sidebar.selectbox("选择页面", pages)
+
+    # 读取 session 中保存的跳转页
+    default_page = st.session_state.get("selected_page", pages[0])
+    page = st.sidebar.selectbox("选择页面", pages, index=pages.index(default_page))
+    st.session_state["selected_page"] = page
+    # print(st.session_state["selected_page"])
+
+    # 清除离开页面的相关状态
+    previous_page = st.session_state.get("current_page")
+    if previous_page != page:
+        if previous_page == "资产详情":
+            st.session_state.pop("selected_asset_id", None)
+        elif previous_page == "编辑物品状态":
+            st.session_state.pop("edit_target_id", None)
+        elif previous_page == "新增物品录入信息":
+            for key in ["item_name", "placement_location", "asset_cost", "purchase_year", "usable_life"]:
+                st.session_state.pop(key, None)
+        st.session_state["current_page"] = page
 
     if page == "资产查询":
         asset_query_page.show()
