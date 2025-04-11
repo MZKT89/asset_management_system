@@ -817,6 +817,7 @@ def get_department_items(department_id):
             return [{
                 "ID": item[0],
                 "Item_Name": item[1],
+                "d_ID": department_id,
                 "Placement_Location": item[2],
                 "Status": item[3],
                 "Current_Value": item[4]
