@@ -56,11 +56,18 @@ else:
 
     # page = st.sidebar.selectbox("选择页面", pages)
 
-    # 读取 session 中保存的跳转页
+    # 默认页面
     default_page = st.session_state.get("selected_page", pages[0])
-    page = st.sidebar.selectbox("选择页面", pages, index=pages.index(default_page))
-    st.session_state["selected_page"] = page
-    # print(st.session_state["selected_page"])
+
+    # 选择页面
+    selected_page = st.sidebar.selectbox("选择页面", pages, index=pages.index(default_page))
+
+    # 如果发生改变，更新 session_state 并立即重新运行
+    if selected_page != st.session_state.get("selected_page"):
+        st.session_state["selected_page"] = selected_page
+        st.rerun()
+
+    page = selected_page
 
     # 清除离开页面的相关状态
     previous_page = st.session_state.get("current_page")
