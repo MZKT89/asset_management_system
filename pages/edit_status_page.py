@@ -14,6 +14,10 @@ def show():
         st.error("请先登录")
         return
 
+    if "edit_success" in st.session_state:
+        st.success(st.session_state["edit_success"])
+        st.session_state.pop("edit_success", None)
+
     user = st.session_state.user
     
     # 获取用户所在部门的资产列表
@@ -23,14 +27,36 @@ def show():
         st.warning("当前部门没有可编辑的资产")
         return
 
-    # 创建资产选择器
+    # # 创建资产选择器
+    # item_options = {f"{item['ID']} - {item['Item_Name']}": item['ID'] for item in items}
+    # selected_item_key = st.selectbox(
+    #     "选择资产",
+    #     options=list(item_options.keys()),
+    #     format_func=lambda x: x
+    # )
+
+    # 获取传入的资产ID
+    edit_id = st.session_state.get("edit_target_id", None)
+
+    # 构建资产选择项
     item_options = {f"{item['ID']} - {item['Item_Name']}": item['ID'] for item in items}
+    option_keys = list(item_options.keys())
+
+    # 根据传入 ID 选中对应选项（如果存在）
+    default_key = None
+    if edit_id:
+        for label, val in item_options.items():
+            if val == edit_id:
+                default_key = label
+                break
+
     selected_item_key = st.selectbox(
         "选择资产",
-        options=list(item_options.keys()),
+        options=option_keys,
+        index=option_keys.index(default_key) if default_key else 0,
         format_func=lambda x: x
     )
-    
+
     if selected_item_key:
         selected_item_id = item_options[selected_item_key]
         item_details = get_item_details(selected_item_id)
@@ -72,12 +98,18 @@ def show():
                         )
                         
                         if success:
-                            st.success(message)
-                            st.experimental_rerun()
+                            st.session_state["edit_success"] = message
+                            # st.session_state.pop("edit_target_id", None)
+                            st.rerun()
                         else:
                             st.error(message)
         else:
             st.error("无法获取资产详情")
+
+    if st.button("返回查询页面"):
+        st.session_state["selected_page"] = "资产查询"
+        st.session_state.pop("edit_target_id", None)
+        st.rerun()
 
 if __name__ == "__main__":
     show()
