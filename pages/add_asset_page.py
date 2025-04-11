@@ -9,19 +9,37 @@ from utils.data_utils import (
 def add_asset_page():
     st.title("新增资产")
 
+    # 显示资产是否添加成功的消息
+    if "asset_add_success" in st.session_state:
+        st.success(st.session_state["asset_add_success"])
+        del st.session_state["asset_add_success"]
+
+
     # 获取部门列表
     departments = get_department_list()
     if not departments:
         st.error("无法获取部门列表")
         return
     
+    # 初始化表单字段默认值（首次访问&提交后除“部门”选项外其他全部自动初始化）
+    if "item_name" not in st.session_state:
+        st.session_state["item_name"] = ""
+    if "placement_location" not in st.session_state:
+        st.session_state["placement_location"] = ""
+    if "asset_cost" not in st.session_state:
+        st.session_state["asset_cost"] = 0.01
+    if "purchase_year" not in st.session_state:
+        st.session_state["purchase_year"] = datetime.now().year
+    if "usable_life" not in st.session_state:
+        st.session_state["usable_life"] = 5
+
     # 表单
     with st.form("add_asset_form"):
         # 资产ID（自动生成）
         item_id = st.text_input("资产ID", value="自动生成", disabled=True)
         
         # 资产名称
-        item_name = st.text_input("资产名称*")
+        item_name = st.text_input("资产名称*", key="item_name")
         
         # 所属部门
         department = st.selectbox(
@@ -37,7 +55,8 @@ def add_asset_page():
                 "采购金额*", 
                 min_value=0.01, 
                 format="%.2f",
-                value=0.01
+                # value=0.01,
+                key="asset_cost"
             )
         
         with col2:
@@ -47,11 +66,12 @@ def add_asset_page():
                 "采购年份*", 
                 min_value=2005, 
                 max_value=2025, 
-                value=current_year
+                # value=current_year,
+                key="purchase_year"
             )
         
         # 存放位置
-        placement_location = st.text_input("存放位置*")
+        placement_location = st.text_input("存放位置*", key="placement_location")
         
         col3, col4 = st.columns(2)
         with col3:
@@ -59,7 +79,8 @@ def add_asset_page():
             usable_life = st.number_input(
                 "使用年限（年）", 
                 min_value=1,
-                value=5
+                # value=5,
+                key="usable_life"
             )
         
         # 提交按钮
@@ -98,10 +119,17 @@ def add_asset_page():
             new_item_id = add_new_item(asset_data)
             
             if new_item_id:
-                st.success(f"资产添加成功！资产ID：{new_item_id}")
-                st.experimental_rerun()
+                st.session_state["asset_add_success"] = f"资产添加成功！资产ID：{new_item_id}"
+                # 提交成功后清空表单字段
+                for key in ["item_name", "placement_location", "asset_cost", "purchase_year", "usable_life"]:
+                    st.session_state.pop(key, None)
+                st.rerun()
             else:
                 st.error("添加失败，请稍后重试")
+    # 返回按钮        
+    if st.button("返回查询页面"):
+        st.session_state["selected_page"] = "资产查询"
+        st.rerun()
 
 def show():
     add_asset_page()
