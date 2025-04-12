@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.data_utils import get_department_items, get_item_details
+from utils.data_utils import get_all_department_items, get_department_items, get_item_details
 
 def show():
     st.title("Asset Query")
@@ -48,8 +48,9 @@ def show():
                     st.warning("No corresponding asset found")
             else:
                 st.info("Guests can only search by asset ID")
+
     else:
-        all_items = get_department_items(d_id)
+        all_items = (get_all_department_items() if role == "super-admin" else get_department_items(d_id))
         for item in all_items:
             if search_term:
                 # Fuzzy search by asset ID or asset name

@@ -814,6 +814,36 @@ def update_item_status(item_id, new_status, user_id):
             conn.close()
     return False, "数据库连接失败"
 
+def get_all_department_items():
+    """
+    获取所有部门的所有资产列表
+    :return: 所有资产的列表
+    """
+    conn = create_connection()
+    if conn:
+        cursor = conn.cursor()
+        try:
+            cursor.execute('''
+                SELECT i.ID, i.Item_Name, i.d_ID, 
+                       i.Placement_Location, i.Status, i.Current_Value
+                FROM ITEM i
+            ''')
+            items = cursor.fetchall()
+            return [{
+                "ID": item[0],
+                "Item_Name": item[1],
+                "d_ID": item[2],
+                "Placement_Location": item[3],
+                "Status": item[4],
+                "Current_Value": item[5]
+            } for item in items]
+        except sqlite3.Error as e:
+            print(f"获取所有部门资产列表出错: {e}")
+        finally:
+            conn.close()
+    return []
+
+
 def get_department_items(department_id):
     """
     获取部门所有资产列表
