@@ -955,6 +955,6 @@ def changePasswordToHash():
         finally:
             conn.close()
 
-if __name__=="__main__":
-    changePasswordToHash()
+# if __name__=="__main__":
+#     changePasswordToHash()
 
