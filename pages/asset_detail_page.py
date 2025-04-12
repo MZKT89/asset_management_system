@@ -70,7 +70,6 @@ def show():
 
     selected_item_id = item_options[selected_item_key]
     asset = get_item_details(selected_item_id)
-    st.session_state["selected_asset_id"] = selected_item_id  # Keep it consistent
 
     if not asset:
         st.error("Asset information not found.")
