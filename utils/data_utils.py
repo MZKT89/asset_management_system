@@ -15,7 +15,10 @@ def create_connection():
     :return: 数据库连接对象
     """
     try:
-        conn = sqlite3.connect('asset_management.db')
+        db_path = '/Users/michaelzhu/Desktop/LearningMaterial/CSC3170/project/asset_management_system/asset_management.db'
+        # conn = sqlite3.connect('asset_management.db')
+        conn = sqlite3.connect(db_path)
+
         return conn
     except sqlite3.Error as e:
         print(e)
@@ -926,3 +929,32 @@ def get_expenditure_trend(department_id, current_year):
         finally:
             conn.close()
     return []
+
+
+def changePasswordToHash():
+    """
+    将所有用户的密码转换为哈希存储
+    :return: None
+    """
+    conn = create_connection()
+    if conn:
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT e_ID, password FROM EMPLOYEE")
+            users = cursor.fetchall()
+            for user in users:
+                user_id, password = user
+                print(f"正在转换用户 {user_id} 的密码")
+                hashed_password = hash_password(password)
+                cursor.execute("UPDATE EMPLOYEE SET password = ? WHERE e_ID = ?", (hashed_password, user_id))
+            conn.commit()
+            print("密码转换成功")
+        except sqlite3.Error as e:
+            print(f"密码转换出错: {e}")
+            conn.rollback()
+        finally:
+            conn.close()
+
+if __name__=="__main__":
+    changePasswordToHash()
+
