@@ -17,11 +17,14 @@ def show():
     search_term = ""
     with col1:
         if role == "guest":
-            search_term = st.text_input("Search for assets (supports asset ID)", placeholder="Enter asset ID")
+            search_term = st.text_input("Search for assets (only supports asset ID)", placeholder="Enter asset ID")
         else:
-            search_term = st.text_input("Search for assets (supports asset ID or asset name)", placeholder="Enter asset ID or asset name")
+            search_term = st.text_input("Search for assets (asset ID or asset name)", placeholder="Enter asset ID or asset name")
     with col2:
-        status_filter = st.selectbox("Filter by status", options=["All", "In use", "Scrapped"])
+        if role != "guest":
+            status_filter = st.selectbox("Filter by status", options=["All", "In use", "Scrapped"])
+        else:
+            status_filter = "All"  # Default filter for guest
     with col3:
         if role != "guest":
             if st.button("Annual Procurement 📊"):
