@@ -15,10 +15,7 @@ def create_connection():
     :return: 数据库连接对象
     """
     try:
-        db_path = '/Users/michaelzhu/Desktop/LearningMaterial/CSC3170/project/asset_management_system/asset_management.db'
-        # conn = sqlite3.connect('asset_management.db')
-        conn = sqlite3.connect(db_path)
-
+        conn = sqlite3.connect('asset_management.db')
         return conn
     except sqlite3.Error as e:
         print(e)
