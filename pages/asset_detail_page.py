@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.data_utils import get_department_items, get_item_details, check_department_admin
+from utils.data_utils import get_department_items, get_item_details, check_department_admin, get_all_department_items
 import sqlite3
 from utils.data_utils import create_connection
 
@@ -40,7 +40,7 @@ def show():
             st.error("Asset information not found.")
             return
     else:
-        all_items = get_department_items(d_id)
+        all_items = (get_all_department_items() if role == "super-admin" else get_department_items(d_id))
         if not all_items:
             st.warning("There are no assets to view.")
             return
