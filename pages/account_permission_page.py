@@ -3,7 +3,7 @@ from utils.data_utils import get_all_users, update_user_role, add_new_user
 import time
 
 def show():
-    st.title("Account Permission Settings Page")
+    st.title("Account Permission Settings")
     st.sidebar.title("Select an Operation")
     selected_operation = st.sidebar.radio("Select an operation", ["View User Information", "Edit User Role", "Add New User"])
 

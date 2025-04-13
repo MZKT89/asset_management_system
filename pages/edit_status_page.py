@@ -7,7 +7,7 @@ from utils.data_utils import (
 )
 
 def show():
-    st.title("Edit Item Status")
+    st.title("Edit Asset Status")
 
     # Check if the user is logged in
     if "user" not in st.session_state or st.session_state.user is None:

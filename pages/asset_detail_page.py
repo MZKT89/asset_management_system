@@ -22,7 +22,7 @@ def get_purchase_records(item_id):
     return []
 
 def show():
-    st.title("Asset Details Page")
+    st.title("Asset Details")
 
     user = st.session_state.get("user", {})
     role = user.get("role", "guest")

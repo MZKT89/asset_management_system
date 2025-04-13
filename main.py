@@ -76,11 +76,11 @@ else:
 
     # 根据用户角色显示不同的页面选项
     if st.session_state.user["role"] == "super-admin":
-        pages = ["Asset Query", "Asset Details", "Total Department Procurement Expenditure", "Add New Item Information", "Edit Item Status", "Account Permission Settings"]
+        pages = ["Asset Query", "Asset Details", "Annual Dept Procurement Expenditure 📈", "Add New Asset", "Edit Asset Status", "Account Permission Settings"]
     elif st.session_state.user["role"] == "dep-admin":
-        pages = ["Asset Query", "Asset Details", "Total Department Procurement Expenditure", "Add New Item Information", "Edit Item Status"]
+        pages = ["Asset Query", "Asset Details", "Annual Dept Procurement Expenditure 📈", "Add New Asset", "Edit Asset Status"]
     elif st.session_state.user["role"] == "non-admin":
-        pages = ["Asset Query", "Asset Details", "Total Department Procurement Expenditure"]
+        pages = ["Asset Query", "Asset Details", "Annual Dept Procurement Expenditure 📈"]
     else:  # 访客
         pages = ["Asset Query", "Asset Details"]
 
@@ -102,22 +102,22 @@ else:
     if previous_page != page:
         if previous_page == "Asset Details":
             st.session_state.pop("selected_asset_id", None)
-        elif previous_page == "Edit Item Status":
+        elif previous_page == "Edit Asset Status":
             st.session_state.pop("edit_target_id", None)
-        elif previous_page == "Add New Item Information":
+        elif previous_page == "Add New Asset":
             for key in ["item_name", "placement_location", "asset_cost", "purchase_year", "usable_life"]:
                 st.session_state.pop(key, None)
         st.session_state["current_page"] = page
 
     if page == "Asset Query":
         asset_query_page.show()
-    elif page == "Total Department Procurement Expenditure":
+    elif page == "Annual Dept Procurement Expenditure 📈":
         expenditure_page.show()
     elif page == "Asset Details":
         asset_detail_page.show()
-    elif page == "Add New Item Information":
+    elif page == "Add New Asset":
         add_asset_page.show()
-    elif page == "Edit Item Status":
+    elif page == "Edit Asset Status":
         edit_status_page.show()
     elif page == "Account Permission Settings":
         account_permission_page.show()

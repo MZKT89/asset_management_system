@@ -25,14 +25,14 @@ def show():
     with col3:
         if role != "guest":
             if st.button("Annual Procurement 📊"):
-                st.session_state["selected_page"] = "Total Department Procurement Expenditure"
+                st.session_state["selected_page"] = "Annual Dept Procurement Expenditure 📈"
                 st.rerun()
 
     # Show the button to add a new asset for administrators
     if role == "dep-admin" or role == "super-admin":
         # Trigger page jump
         if st.button("Add new asset"):
-            st.session_state["selected_page"] = "Add New Item Information"
+            st.session_state["selected_page"] = "Add New Asset"
             st.rerun()
 
     # ---------------------- Data Query Logic ----------------------
