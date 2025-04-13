@@ -503,7 +503,7 @@ def update_item_status(item_id, new_status, user_id):
     
     # 检查用户权限
     if not check_department_admin(user_id, item['d_ID']):
-        return False, "您没有权限修改此资产状态"
+        return False, "You do not have permission to modify the status of this asset"
     
     # 验证状态值
     if new_status not in [0, 1]:
@@ -520,7 +520,7 @@ def update_item_status(item_id, new_status, user_id):
             ''', (new_status, item_id))
             
             conn.commit()
-            return True, "状态更新成功"
+            return True, "Status updated successfully"
         except sqlite3.Error as e:
             print(f"更新资产状态出错: {e}")
             conn.rollback()
@@ -784,7 +784,7 @@ def update_item_status(item_id, new_status, user_id):
     
     # 检查用户权限
     if not check_department_admin(user_id, item['d_ID']):
-        return False, "您没有权限修改此资产状态"
+        return False, "You do not have permission to modify the status of this asset"
     
     # 验证状态值
     if new_status not in [0, 1]:
@@ -801,7 +801,7 @@ def update_item_status(item_id, new_status, user_id):
             ''', (new_status, item_id))
             
             conn.commit()
-            return True, "状态更新成功"
+            return True, "Status updated successfully"
         except sqlite3.Error as e:
             print(f"更新资产状态出错: {e}")
             conn.rollback()

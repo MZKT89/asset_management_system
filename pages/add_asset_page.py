@@ -9,16 +9,25 @@ from utils.data_utils import (
 def add_asset_page():
     st.title("Add New Asset")
 
-    # Display a message indicating whether the asset was added successfully
+    # Display success message
     if "asset_add_success" in st.session_state:
         st.success(st.session_state["asset_add_success"])
         del st.session_state["asset_add_success"]
 
-    # Get the department list
+    # Get department list
     departments = get_department_list()
     if not departments:
         st.error("Unable to get the department list")
         return
+
+    # Filter departments for department admin
+    user = st.session_state.user
+    if user["role"] == "dep-admin":
+        # 修改过滤逻辑，使用整数比较
+        departments = [dept for dept in departments if int(dept[0]) == int(user["d_id"])]
+        if not departments:
+            st.error("Department information not found")
+            return
 
     # Initialize default values for form fields (automatically initialize all except the 'Department' option on first visit and after submission)
     if "item_name" not in st.session_state:

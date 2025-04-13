@@ -57,8 +57,8 @@ def show():
         item_details = get_item_details(selected_item_id)
 
         if item_details:
-            # Check if the user is a department administrator
-            is_admin = check_department_admin(user["e_id"], item_details["d_ID"])
+            # 修改权限检查逻辑
+            is_admin = user["role"] == "super-admin" or check_department_admin(user["e_id"], item_details["d_ID"])
 
             # Display asset details
             with st.form("edit_status_form"):
