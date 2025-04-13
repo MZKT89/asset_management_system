@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.data_utils import get_all_department_items, get_department_items, get_item_details
+from utils.data_utils import get_all_department_items, get_department_items, get_item_details, query_department_Name
 
 def show():
     st.title("Asset Query")
@@ -81,34 +81,48 @@ def show():
         st.subheader("Asset List")
     for idx, item in enumerate(assets):
         with st.container():
-            cols = st.columns([2, 2, 2, 2, 2])
+            cols = st.columns(4)  # 四列
 
+            # 第一列，两行内容
             with cols[0]:
-                st.markdown(f"**Asset ID**: {item['ID']}")
-                st.markdown(f"**Asset Name**: {item['Item_Name']}")
+                st.markdown(f"**Asset ID**")
+                st.markdown(f"{item['ID']}")
+                st.markdown(f"**Asset Name**")
+                st.markdown(f"{item['Item_Name']}")
 
+            # 第二列，两行内容
             with cols[1]:
-                st.markdown(f"**Status**: {'🟢 In use' if item['Status'] == 1 else '🔴 Scrapped'}")
-                st.markdown(f"**Storage Location**: {item['Placement_Location']}")
+                st.markdown(f"**Status**")
+                st.markdown("🟢 In use" if item["Status"] == 1 else "🔴 Scrapped")
+                st.markdown(f"**Storage Location**")
+                st.markdown(f"{item['Placement_Location']}")
 
-            if role != "guest":
-                with cols[2]:
-                    st.markdown(f"**Managing Department ID**: {item.get('d_ID', '-')}")
-                    st.markdown(f"**Current Value**: ￥{item['Current_Value']}")
+            # 第三列，两行内容（根据角色显示部门信息）
+            with cols[2]:
+                d_ID = item["d_ID"]
+                d_name = query_department_Name(d_ID) or "Unknown"
+                if role != "guest":
+                    st.markdown(f"**Managing Department**")
+                    st.markdown(f"{d_name}")
+                    st.markdown(f"**Current Value**")
+                    st.markdown(f"￥{item['Current_Value']}")
+                else:
+                    st.markdown(f"**Managing Department**")
+                    st.markdown(f"{d_name}")
+                    st.markdown("")  # 空行保持对齐
+                    st.markdown("")
 
-            # Operation button column
+            # 第四列，两行按钮
             with cols[3]:
+                st.markdown("**Operations**")
                 if st.button(f"View Details", key=f"view_{item['ID']}"):
                     st.session_state["selected_asset_id"] = item["ID"]
                     st.session_state["selected_page"] = "Asset Details"
                     st.rerun()
-
-            with cols[4]:
-                if role == "dep-admin" or role == "super-admin":
+                if role in ("dep-admin", "super-admin"):
                     if st.button("Edit Status", key=f"edit_{item['ID']}"):
                         st.session_state["edit_target_id"] = item["ID"]
-                        st.session_state["selected_page"] = "Edit Item Status"
+                        st.session_state["selected_page"] = "Edit Asset Status"
                         st.rerun()
 
         st.markdown("---")
-    
