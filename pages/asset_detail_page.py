@@ -115,10 +115,10 @@ def show():
             st.info("No purchase records available.")
 
     # ---------------------- Operation Buttons (Only for Department Administrators) ----------------------
-    if role == "dep-admin" and check_department_admin(e_id, asset["d_ID"]):
-        if st.button("Edit Item Status", key="edit_status_from_detail"):
+    if (role == "dep-admin" and check_department_admin(e_id, asset["d_ID"])) or role == "super-admin":
+        if st.button("Edit Asset Status", key="edit_status_from_detail"):
             st.session_state["edit_target_id"] = asset["ID"]
-            st.session_state["selected_page"] = "Edit Item Status"
+            st.session_state["selected_page"] = "Edit Asset Status"
             st.rerun()
 
     # ---------------------- Back Button ----------------------
