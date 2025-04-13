@@ -1,6 +1,7 @@
 import streamlit as st
 from utils.data_utils import (
     get_department_items,
+    get_all_department_items,
     get_item_details,
     update_item_status,
     check_department_admin
@@ -19,9 +20,11 @@ def show():
         st.session_state.pop("edit_success", None)
 
     user = st.session_state.user
+    role = user.get("role", "guest")
+    d_id = user.get("d_id", None)
 
     # Get the list of assets in the user's department
-    items = get_department_items(user["d_id"])
+    items = (get_department_items(d_id) if role == "dep-admin" else get_all_department_items())
 
     if not items:
         st.warning("There are no editable assets in the current department")
