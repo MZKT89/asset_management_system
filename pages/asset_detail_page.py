@@ -1,25 +1,7 @@
 import streamlit as st
-from utils.data_utils import get_department_items, get_item_details, check_department_admin, get_all_department_items
+from utils.data_utils import get_department_items, get_item_details, check_department_admin, get_all_department_items, get_purchase_records
 import sqlite3
 from utils.data_utils import create_connection
-
-def get_purchase_records(item_id):
-    conn = create_connection()
-    if conn:
-        cursor = conn.cursor()
-        try:
-            cursor.execute('''
-                SELECT p.ID, p.Asset_Cost, d.Department_Name
-                FROM PURCHASE_INFO p
-                JOIN DEPARTMENT d ON p.d_ID = d.d_ID
-                WHERE p.ID = ?
-            ''', (item_id,))
-            return cursor.fetchall()
-        except sqlite3.Error as e:
-            print(f"Failed to query purchase records: {e}")
-        finally:
-            conn.close()
-    return []
 
 def show():
     st.title("Asset Details")

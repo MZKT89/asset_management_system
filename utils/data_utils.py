@@ -326,7 +326,6 @@ def test_login_add_data():
 登陆页以及权限设置页部分的处理代码逻辑
 '''
 
-
 def get_department_list():
     """
     获取所有部门列表
@@ -430,7 +429,6 @@ def validate_item_data(item_data):
         return False, "采购年份必须在2005-2025之间"
     
     return True, ""
-
 
 def get_item_details(item_id):
     """
@@ -609,7 +607,6 @@ def test_login_add_data():
 登陆页以及权限设置页部分的处理代码逻辑
 '''
 
-
 def get_department_list():
     """
     获取所有部门列表
@@ -713,7 +710,6 @@ def validate_item_data(item_data):
         return False, "采购年份必须在2005-2025之间"
     
     return True, ""
-
 
 def get_item_details(item_id):
     """
@@ -843,6 +839,28 @@ def get_all_department_items():
             conn.close()
     return []
 
+def get_purchase_records(item_id):
+    """
+    获取资产的采购记录
+    :param item_id: 资产ID
+    :return: 采购记录列表
+    """
+    conn = create_connection()
+    if conn:
+        cursor = conn.cursor()
+        try:
+            cursor.execute('''
+                SELECT p.ID, p.Asset_Cost, d.Department_Name
+                FROM PURCHASE_INFO p
+                JOIN DEPARTMENT d ON p.d_ID = d.d_ID
+                WHERE p.ID = ?
+            ''', (item_id,))
+            return cursor.fetchall()
+        except sqlite3.Error as e:
+            print(f"Failed to query purchase records: {e}")
+        finally:
+            conn.close()
+    return []
 
 def get_department_items(department_id):
     """
@@ -875,7 +893,40 @@ def get_department_items(department_id):
             conn.close()
     return []
 
+def get_purchase_records(item_id):
+    """
+    获取资产的采购记录
+    :param item_id: 资产ID
+    :return: 采购记录列表
+    """
+    conn = create_connection()
+    if conn:
+        cursor = conn.cursor()
+        try:
+            cursor.execute('''
+                SELECT p.ID, p.Asset_Cost, d.Department_Name
+                FROM PURCHASE_INFO p
+                JOIN DEPARTMENT d ON p.d_ID = d.d_ID
+                WHERE p.ID = ?
+            ''', (item_id,))
+            return cursor.fetchall()
+        except sqlite3.Error as e:
+            print(f"Failed to query purchase records: {e}")
+        finally:
+            conn.close()
+    return []
+
 def get_department_expenditure(department_id, year):
+    """
+    获取指定部门在指定年份的采购总支出
+    :param department_id: 部门ID
+    :param year: 年份
+    :return: 返回一个字典，包含总支出和同比增减比例，例如：
+             {
+                "total_cost": 50000,
+                "comparison": "+10%"
+             }
+    """
     conn = create_connection()
     if conn:
         cursor = conn.cursor()
@@ -912,6 +963,7 @@ def get_department_expenditure(department_id, year):
         finally:
             conn.close()
     return {"total_cost": 0, "comparison": "No Connection"}
+
 def get_expenditure_trend(department_id, current_year):
     """
     获取指定部门近 5 年（包括当前年）的采购趋势数据
@@ -956,7 +1008,6 @@ def get_expenditure_trend(department_id, current_year):
         finally:
             conn.close()
     return []
-
 
 def changePasswordToHash():
     """
