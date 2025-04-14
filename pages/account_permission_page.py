@@ -45,11 +45,15 @@ def show():
             contact = None
             if new_role_num == 1:
                 contact = st.text_input("Please enter the contact information")
+                if contact and not contact.isdigit():
+                    st.error("Contact information must be a number.")
 
             if st.button("Update Role"):
                 if user_id and new_role_num is not None:
                     if new_role_num == 1 and not contact:
                         st.error("Please enter the contact information")
+                    elif new_role_num == 1 and len(contact) != 11:  # 检查电话号码位数是否为 11 位
+                        st.error("Please enter a valid 11 - digit phone number.")
                     else:
                         if update_user_role(user_id, new_role_num, contact):
                             st.success("Role updated successfully!")
@@ -77,11 +81,14 @@ def show():
             new_contact = None
             if position_num == 1:
                 new_contact = st.text_input("Please enter the contact information for the new user")
-
+                if new_contact and not new_contact.isdigit():
+                    st.error("Contact information must be a number.")
             if st.button("Add User"):
                 if E_name and password and department_id and position_num is not None:
                     if position_num == 1 and not new_contact:
                         st.error("Please enter the contact information for the new user")
+                    elif position_num == 1 and len(new_contact) != 11:  # 检查电话号码位数是否为 11 位
+                        st.error("Please enter a valid 11 - digit phone number.")
                     else:
                         if add_new_user(E_name, password, department_id, position_num, new_contact):
                             st.success("User added successfully!")
