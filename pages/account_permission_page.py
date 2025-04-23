@@ -49,7 +49,10 @@ def show():
                     st.error("Contact information must be a number.")
 
             if st.button("Update Role"):
-                if user_id and new_role_num is not None:
+                if user_id == 1:
+                    st.error("The original super admin cannot be modified.")
+
+                elif user_id and new_role_num is not None:
                     if new_role_num == 1 and not contact:
                         st.error("Please enter the contact information")
                     elif new_role_num == 1 and len(contact) != 11:  # 检查电话号码位数是否为 11 位
